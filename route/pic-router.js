@@ -29,11 +29,21 @@ function s3uploadProm(params) {
   });
 }
 
+function s3deleteProm(params) {
+  return new Promise((resolve, reject) => {
+    s3.deleteObject(params, (err, s3data) => {
+      resolve(s3data);
+    });
+  });
+}
+
 picRouter.post('/api/contact/:contactID/pic', bearerAuth, upload.single('image'), function(req, res, next) {
   debug('POST: /api/contact/:contactID/pic');
 
   if (!req.file) return next(createError(400, 'file not found'));
   if (!req.file.path) return next(createError(500, 'file not saved'));
+
+  console.log('req:', req);
 
   let ext = path.extname(req.file.originalname);
 
@@ -47,8 +57,6 @@ picRouter.post('/api/contact/:contactID/pic', bearerAuth, upload.single('image')
   Contact.findById(req.params.contactID)
   .then( () => s3uploadProm(params))
   .then( s3data => {
-    console.log('******** s3:', s3data);
-
     del([`${dataDir}/*`]);
 
     let picData = {
@@ -65,3 +73,19 @@ picRouter.post('/api/contact/:contactID/pic', bearerAuth, upload.single('image')
   .then( pic => res.json(pic))
   .catch( err => next(err));
 });
+//
+// picRouter.delete('/api/contact/:contactID/pic', bearerAuth, function(req, res, next) {
+//   debug('DELETE: /api/contact/:contactID/pic');
+//
+//   if (!req.file) return next(createError(400, 'file not found'));
+//   if (!req.file.path) return next(createError(500, 'file not saved'));
+//
+//   let params = {
+//     Bucket: process.env.AWS_BUCKET,
+//     Key: `${req.file.filename}${ext}`
+//   };
+//
+//   Contact.findById(req.params.contactID)
+//   .then( () => s3deleteProm(params))
+//
+// });
