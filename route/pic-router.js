@@ -43,8 +43,6 @@ picRouter.post('/api/contact/:contactID/pic', bearerAuth, upload.single('image')
   if (!req.file) return next(createError(400, 'file not found'));
   if (!req.file.path) return next(createError(500, 'file not saved'));
 
-  console.log('req:', req);
-
   let ext = path.extname(req.file.originalname);
 
   let params = {
@@ -73,7 +71,7 @@ picRouter.post('/api/contact/:contactID/pic', bearerAuth, upload.single('image')
   .then( pic => res.json(pic))
   .catch( err => next(err));
 });
-//
+
 // picRouter.delete('/api/contact/:contactID/pic', bearerAuth, function(req, res, next) {
 //   debug('DELETE: /api/contact/:contactID/pic');
 //
